@@ -1,0 +1,10 @@
+# Arquivos locais e dados que não devem ser publicados
+.env
+*.dump
+*.backup
+*.bak
+*.log
+.DS_Store
+Thumbs.db
+
+# Não adicionar exportações completas de bases de dados ao repositório.

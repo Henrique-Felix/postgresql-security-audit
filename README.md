@@ -16,7 +16,7 @@ O objetivo é praticar e demonstrar, de forma reproduzível, como inspecionar o 
 ### 1. Diagnóstico do ambiente
 Versão do PostgreSQL, banco conectado e usuário atual da sessão.
 
-![Diagnóstico do ambiente](evidencias/00-diagnostico-ambiente.png)
+![Diagnóstico do ambiente](evidencias/01-diagnostico-ambiente-detalhado.png)
 
 ### 2. Inventário de objetos do schema `public`
 A consulta retornou 22 objetos, incluindo tabelas-base e views.

@@ -1,11 +1,11 @@
 # PostgreSQL Security & Database Auditing
 
 **Status:** Em desenvolvimento  
-**Tipo:** Projeto pessoal de laboratório  
+**Tipo:** Projeto pessoal
 **Tecnologias:** PostgreSQL 18.6, SQL, pgAdmin, Git e GitHub
 
 ## Sobre o projeto
-Este projeto documenta um laboratório pessoal de análise de segurança e auditoria de consultas SQL utilizando a base demonstrativa `dvdrental` no PostgreSQL.
+Este projeto pessoal de análise de segurança e auditoria de consultas SQL utilizando a base demonstrativa `dvdrental` no PostgreSQL.
 
 O objetivo é praticar e demonstrar, de forma reproduzível, como inspecionar o ambiente, inventariar objetos, entender a estrutura de tabelas, reduzir a exposição desnecessária de dados em consultas e revisar privilégios de acesso.
 

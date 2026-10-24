@@ -1,83 +1,91 @@
 # PostgreSQL Security & Database Auditing
 
-**Projeto pessoal em Segurança da Informação**
+**Laboratório prático de Segurança da Informação aplicada a bancos de dados PostgreSQL**
 
 > **Status:** em desenvolvimento  
-> **Ambiente de estudo:** PostgreSQL 18.6 no Windows, administrado pelo pgAdmin 4  
-> **Base de dados:** `dvdrental`  
-> **Escopo atual:** diagnóstico do ambiente e revisão inicial de papéis e privilégios
+> **Ambiente observado:** PostgreSQL 18.6 no Windows · pgAdmin 4  
+> **Base de estudo:** `dvdrental` · **Schema:** `public`
 
 ## Sobre o projeto
 
-Este projeto documenta a construção gradual de um laboratório de segurança para bancos de dados PostgreSQL. O objetivo é praticar a análise de permissões, a investigação de atividades e a auditoria de acessos, registrando consultas reproduzíveis, resultados observados e limitações.
+Este projeto documenta a construção gradual de um laboratório de segurança para bancos de dados PostgreSQL. O foco é praticar inventário, revisão de papéis e privilégios, auditoria de atividades e monitoramento de acessos, registrando consultas reproduzíveis e evidências reais das execuções.
 
-A proposta final é evoluir o laboratório para um fluxo de auditoria com **PostgreSQL + pgAudit + Elasticsearch + Kibana**. A integração entre essas ferramentas ainda está planejada e só será considerada concluída depois de configurada, executada e validada.
+A arquitetura planejada evolui de PostgreSQL para **pgAudit + Elasticsearch + Kibana**, com coleta de eventos, pesquisa e dashboards. A integração dessas ferramentas ainda não foi implementada nem validada.
 
 ## Objetivos
 
-- Inventariar o ambiente, os objetos do banco e suas estruturas.
+- Diagnosticar o ambiente e inventariar objetos do banco.
+- Examinar a estrutura de tabelas e a exposição de dados.
 - Revisar papéis, associações e privilégios efetivos.
-- Investigar consultas e atividades relevantes para a segurança.
-- Avaliar e configurar o pgAudit com um escopo de auditoria definido.
-- Encaminhar logs para o Elasticsearch e realizar pesquisas sobre os eventos coletados.
+- Avaliar e configurar o pgAudit com escopo definido.
+- Encaminhar logs ao Elasticsearch e investigar eventos.
 - Criar visualizações e dashboards no Kibana.
-- Documentar decisões, limitações e evidências reais para o portfólio.
+- Documentar decisões, limitações e evidências verificáveis.
 
-## Tecnologias
+## Tecnologias e estado
 
-| Tecnologia | Uso previsto | Estado |
+| Tecnologia | Papel no projeto | Estado |
 |---|---|---|
 | PostgreSQL 18.6 | Banco de dados do laboratório | Ambiente observado |
-| SQL | Consultas de diagnóstico e investigação | Em uso |
-| pgAdmin 4 | Administração e execução de consultas | Em uso |
-| pgAudit | Auditoria de atividades do PostgreSQL | Pendente de avaliação e configuração |
-| Elasticsearch | Armazenamento e pesquisa dos logs ingeridos | Pendente |
-| Kibana | Pesquisa visual, visualizações e dashboards | Pendente |
-| Git e GitHub | Versionamento e documentação do projeto | Em uso |
+| SQL | Consultas de diagnóstico e revisão | Em uso |
+| pgAdmin 4 | Administração e execução das consultas | Em uso |
+| pgAudit | Auditoria de atividades | Pendente de avaliação/configuração |
+| Elasticsearch | Ingestão e pesquisa de logs | Pendente |
+| Kibana | Visualizações e dashboards | Pendente |
+| Git/GitHub | Versionamento e documentação | Em uso |
 
-## Ambiente e escopo
+## Evidências práticas
 
-- Sistema operacional: Windows.
-- Banco de estudo: `dvdrental`.
-- Schema principal: `public`.
-- Tabela inicialmente analisada: `public.customer`.
-
-As consultas de diagnóstico e revisão de privilégios realizadas até aqui foram de leitura. Nenhuma permissão foi alterada durante essa etapa.
-
-## Etapas concluídas e resultados observados
+As imagens abaixo são capturas reais do pgAdmin fornecidas para documentar o laboratório. Cada seção apresenta o objetivo, a consulta executada e o que é possível concluir do resultado.
 
 ### 1. Diagnóstico do ambiente
 
-O resultado registrado nas consultas confirmou:
+A consulta utiliza `version()`, `current_database()` e `current_user` para registrar a versão do PostgreSQL, o banco conectado e o usuário efetivo da sessão.
 
-- Banco atual: `dvdrental`.
-- Usuário efetivo e usuário da sessão: `postgres`.
-- Versão observada: PostgreSQL 18.6 em Windows 64 bits.
+![Evidência 1 — Diagnóstico do ambiente PostgreSQL](evidencias/01-diagnostico-ambiente.png)
 
-Esses dados descrevem a sessão utilizada no laboratório; não representam, por si só, uma avaliação completa da segurança do servidor.
+**Resultado observado:** PostgreSQL 18.6 em Windows 64 bits; banco `dvdrental`; usuário `postgres`.
 
-### 2. Inventário inicial do schema `public`
+### 2. Inventário de objetos do schema `public`
 
-O inventário documentado anteriormente registrou **22 objetos retornados pela consulta utilizada**, incluindo tabelas e views. Esse número deve ser interpretado conforme os filtros e os tipos de objeto considerados pela consulta de inventário.
+A consulta lê `information_schema.tables` e filtra `table_schema = 'public'`, listando nomes e tipos de objetos expostos nessa visão de metadados.
 
-### 3. Estrutura de `public.customer`
+![Evidência 2 — Inventário de objetos do schema public](evidencias/02-inventario-objetos-public.png)
 
-Foi documentada a estrutura de 10 colunas da tabela `public.customer`, incluindo tipos de dados, nulabilidade e limites de caracteres, conforme os resultados observados no pgAdmin.
+**Resultado observado:** a consulta retornou 22 linhas. A lista inclui tabelas-base e views, conforme a classificação apresentada no resultado. A contagem corresponde ao filtro e à consulta mostrados, não necessariamente a todos os tipos de objetos existentes no schema.
 
-### 4. Revisão inicial de papéis e privilégios
+### 3. Estrutura da tabela `public.customer`
 
-Foram executadas consultas somente de leitura para inspecionar atributos de papéis, associações e privilégios relacionados ao banco, ao schema `public` e à tabela `public.customer`.
+A consulta lê `information_schema.columns` para mostrar o nome de cada coluna, o tipo de dado, a nulabilidade e o limite máximo de caracteres, ordenando pela posição da coluna.
 
-Principais observações registradas:
+![Evidência 3 — Estrutura da tabela customer](evidencias/03-estrutura-tabela-customer.png)
 
-- A consulta de inventário de papéis retornou 17 papéis.
-- `postgres` apareceu como proprietário de `public.customer`.
-- A coluna `relacl` da tabela retornou `NULL`. Isso **não significa ausência de privilégios**: quando não há uma ACL explícita armazenada, é necessário considerar os privilégios padrão e a propriedade do objeto.
-- Nas verificações de privilégios efetivos realizadas, `pg_read_all_data` apresentou `SELECT` como verdadeiro, e `pg_write_all_data` apresentou `INSERT`, `UPDATE` e `DELETE` como verdadeiros. Esses resultados devem ser interpretados no contexto da função consultada e do objeto avaliado.
-- O papel `postgres` apresentou como verdadeiros os cinco privilégios testados na consulta de tabela: `SELECT`, `INSERT`, `UPDATE`, `DELETE` e `TRUNCATE`.
-- A consulta de associação filtrada para os papéis `pg_read_all_data` e `pg_write_all_data` não retornou linhas. Isso indica apenas que não foram encontradas associações diretas que correspondessem àquele filtro; não prova ausência de toda forma possível de acesso indireto.
+**Resultado observado:** 10 colunas. A saída permite identificar, por exemplo, quais campos aceitam `NULL` e quais têm limites de caracteres definidos. Esta inspeção de metadados não demonstra, por si só, que houve minimização dos dados ou que os dados estejam protegidos.
 
-**Interpretação responsável:** esses resultados são observações do laboratório, não uma declaração de vulnerabilidade nem uma auditoria exaustiva de todos os caminhos de autorização do PostgreSQL.
+### 4. Privilégios associados à tabela `public.customer`
+
+A consulta usa `information_schema.role_table_grants` para listar o beneficiário, o tipo de privilégio e se ele pode conceder esse privilégio a outros usuários.
+
+![Evidência 4 — Privilégios da tabela customer](evidencias/04-privilegios-customer.png)
+
+**Resultado observado:** a consulta retornou sete linhas para `postgres`: `DELETE`, `INSERT`, `REFERENCES`, `SELECT`, `TRIGGER`, `TRUNCATE` e `UPDATE`, com `YES` na coluna `is_grantable`.
+
+**Limitação importante:** `role_table_grants` não deve ser tratado como uma visão completa de todos os caminhos possíveis de autorização. O resultado mostra os grants expostos por essa consulta e não substitui a análise de privilégios efetivos, propriedade, associações de papéis e privilégios herdados.
+
+## Resumo do que foi executado
+
+- [x] Diagnóstico inicial do ambiente.
+- [x] Inventário de objetos retornados pela consulta ao schema `public`.
+- [x] Inspeção das 10 colunas de `public.customer`.
+- [x] Consulta inicial de grants para `public.customer`.
+- [ ] Consolidar a revisão de privilégios efetivos e caminhos de autorização.
+- [ ] Avaliar compatibilidade e disponibilidade do pgAudit para PostgreSQL 18.6 no Windows.
+- [ ] Configurar o pgAudit, se compatível, e validar a geração de eventos.
+- [ ] Implementar a ingestão dos logs no Elasticsearch e verificar os documentos ingeridos.
+- [ ] Criar pesquisas, visualizações e dashboards no Kibana.
+- [ ] Executar testes controlados de investigação e consolidar relatório técnico.
+
+Uma etapa só será considerada concluída após execução e validação prática. Nenhuma configuração do pgAudit, ingestão no Elasticsearch ou dashboard do Kibana está sendo declarada como pronta neste momento.
 
 ## Estrutura do repositório
 
@@ -90,44 +98,28 @@ Principais observações registradas:
 ├── sql/
 │   └── 04_revisao_privilegios.sql
 ├── evidencias/
+│   ├── 01-diagnostico-ambiente.png
+│   ├── 02-inventario-objetos-public.png
+│   ├── 03-estrutura-tabela-customer.png
+│   └── 04-privilegios-customer.png
 └── relatorios/
 ```
 
-A estrutura acima mostra os arquivos principais previstos/registrados para esta etapa. Outros arquivos existentes no repositório devem ser preservados. A pasta `evidencias/` deve conter somente capturas reais aprovadas para publicação.
+## Segurança e limitações
 
-## Roadmap
+- As consultas apresentadas nesta fase são de leitura de metadados.
+- Nenhuma permissão foi alterada durante as consultas documentadas aqui.
+- As evidências mostram resultados específicos; não equivalem a uma auditoria completa de segurança.
+- Não publicar senhas, dados pessoais ou logs sensíveis.
+- As imagens publicadas devem ser capturas reais revisadas e aprovadas pelo autor.
 
-- [x] Diagnóstico inicial do ambiente PostgreSQL.
-- [x] Inventário inicial de objetos do schema `public`.
-- [x] Documentação da estrutura de `public.customer`.
-- [x] Consultas iniciais de revisão de papéis e privilégios.
-- [ ] Consolidar e validar as conclusões da revisão de privilégios.
-- [ ] Avaliar a compatibilidade e a disponibilidade do pgAudit para o ambiente PostgreSQL 18.6 no Windows.
-- [ ] Definir o escopo de auditoria e configurar o pgAudit, se compatível.
-- [ ] Gerar um evento controlado e validar o registro correspondente nos logs.
-- [ ] Definir e implementar a ingestão dos logs no Elasticsearch.
-- [ ] Pesquisar eventos ingeridos e criar visualizações/dashboards no Kibana.
-- [ ] Executar testes controlados de investigação.
-- [ ] Consolidar relatório técnico e evidências aprovadas.
+## Documentação relacionada
 
-Uma etapa só será marcada como concluída depois da execução e validação prática correspondente.
+- [`docs/revisao_privilegios.md`](docs/revisao_privilegios.md) — documentação da revisão inicial.
+- [`sql/04_revisao_privilegios.sql`](sql/04_revisao_privilegios.sql) — consultas SQL de revisão de privilégios.
 
-## Segurança, limitações e evidências
+## Repositório
 
-- As consultas de diagnóstico desta fase são somente de leitura; não foram alteradas permissões.
-- A configuração do pgAudit, a ingestão no Elasticsearch e os dashboards no Kibana ainda não foram validados.
-- Não publicar senhas, dados pessoais, logs sensíveis ou capturas que não tenham sido aprovadas.
-- Registrar separadamente fatos observados, hipóteses e recomendações.
-- Não declarar vulnerabilidades sem evidências suficientes.
-- As evidências visuais serão adicionadas somente quando forem capturas reais fornecidas ou aprovadas pelo autor.
+[Henrique-Felix/postgresql-security-audit](https://github.com/Henrique-Felix/postgresql-security-audit)
 
-## Documentação e scripts
-
-- [`docs/revisao_privilegios.md`](docs/revisao_privilegios.md) — documentação da revisão inicial de privilégios.
-- [`sql/04_revisao_privilegios.sql`](sql/04_revisao_privilegios.sql) — consultas SQL de diagnóstico utilizadas nessa etapa.
-
-## Autor e repositório
-
-Repositório: [Henrique-Felix/postgresql-security-audit](https://github.com/Henrique-Felix/postgresql-security-audit)
-
-Projeto pessoal desenvolvido para estudo prático e construção de portfólio em Segurança da Informação.
+Projeto pessoal para estudo prático e construção de portfólio em Segurança da Informação.

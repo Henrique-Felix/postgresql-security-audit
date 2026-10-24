@@ -1,6 +1,6 @@
 # PostgreSQL Security & Database Auditing
 
-**Projeto pessoal de laboratório e portfólio em Segurança da Informação**
+**Projeto pessoal em Segurança da Informação**
 
 > **Status:** em desenvolvimento  
 > **Ambiente de estudo:** PostgreSQL 18.6 no Windows, administrado pelo pgAdmin 4  
